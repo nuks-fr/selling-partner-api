@@ -100,7 +100,7 @@ class Document
                 throw $e;
             }
         }
-        
+
         $rawContents = $response->getBody()->getContents();
 
         $contents = null;
@@ -108,13 +108,6 @@ class Document
             $contents = gzdecode($rawContents);
         } else {
             $contents = $rawContents;
-        }
-
-        // Don't try to parse report data. Useful for very large reports, or if someone
-        // wants to do custom parsing
-        if (!$postProcess) {
-            $this->data = $contents;
-            return $contents;
         }
 
         // Document encodings depend on the target marketplace. English-language reports are
@@ -137,6 +130,13 @@ class Document
                 $encoding = mb_detect_encoding($contents, $encodings, true);
             }
             $contents = mb_convert_encoding($contents, "UTF-8", $encoding ?? mb_internal_encoding());
+        }
+
+        // Don't try to parse report data. Useful for very large reports, or if someone
+        // wants to do custom parsing
+        if (!$postProcess) {
+            $this->data = $contents;
+            return $contents;
         }
 
         $this->tmpFilename = tempnam(sys_get_temp_dir(), "tempdoc_spapi");
@@ -182,7 +182,7 @@ class Document
                 break;
             case ContentType::XML:
                 $this->data = simplexml_load_string($contents);
-                break;               
+                break;
         }
 
         return $contents;
