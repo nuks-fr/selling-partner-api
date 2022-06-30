@@ -129,7 +129,7 @@ class Document
                 }
                 $encoding = mb_detect_encoding($contents, $encodings, true);
             }
-            $contents = mb_convert_encoding($contents, "UTF-8", $encoding ?? mb_internal_encoding());
+            $contents = mb_convert_encoding($contents, "UTF-8", $encoding ?: mb_internal_encoding());
         }
 
         // Don't try to parse report data. Useful for very large reports, or if someone
