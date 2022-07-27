@@ -42,7 +42,7 @@ use \SellingPartnerApi\Model\ModelInterface;
  * @template TKey int|null
  * @template TValue mixed|null  
  */
-class Error implements ModelInterface, ArrayAccess, \JsonSerializable
+class Error implements ModelInterface, ArrayAccess, \JsonSerializable, \IteratorAggregate
 {
     public const DISCRIMINATOR = null;
 
@@ -200,7 +200,6 @@ class Error implements ModelInterface, ArrayAccess, \JsonSerializable
     public function listInvalidProperties()
     {
         $invalidProperties = [];
-
         if ($this->container['code'] === null) {
             $invalidProperties[] = "'code' can't be null";
         }
@@ -213,10 +212,6 @@ class Error implements ModelInterface, ArrayAccess, \JsonSerializable
         }
         if ((mb_strlen($this->container['message']) < 1)) {
             $invalidProperties[] = "invalid value for 'message', the character length must be bigger than or equal to 1.";
-        }
-
-        if (!is_null($this->container['details']) && (mb_strlen($this->container['details']) < 1)) {
-            $invalidProperties[] = "invalid value for 'details', the character length must be bigger than or equal to 1.";
         }
 
         return $invalidProperties;
@@ -309,11 +304,6 @@ class Error implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function setDetails($details)
     {
-
-        if (!is_null($details) && (mb_strlen($details) < 1)) {
-            throw new \InvalidArgumentException('invalid length for $details when calling Error., must be bigger than or equal to 1.');
-        }
-
         $this->container['details'] = $details;
 
         return $this;
@@ -410,6 +400,53 @@ class Error implements ModelInterface, ArrayAccess, \JsonSerializable
     public function toHeaderValue()
     {
         return json_encode(ObjectSerializer::sanitizeForSerialization($this));
+    }
+
+    /**
+     * Enable iterating over all of the model's attributes in $key => $value format
+     *
+     * @return \Traversable
+     */
+    public function getIterator(): \Traversable
+    {
+        return (function () {
+            foreach ($this->container as $key => $value) {
+                yield $key => $value;
+            }
+        })();
+    }
+
+    /**
+     * Retrieves the property with the given name by converting the property accession
+     * to a getter call.
+     *
+     * @param string $propertyName
+     * @return mixed
+     */
+    public function __get($propertyName)
+    {
+        // This doesn't make a syntactical difference since PHP is case-insensitive, but
+        // makes error messages clearer (e.g. "Call to undefined method getFoo()" rather
+        // than "Call to undefined method getfoo()").
+        $ucProp = ucfirst($propertyName);
+        $getter = "get$ucProp";
+        return $this->$getter();
+    }
+
+    /**
+     * Sets the property with the given name by converting the property accession
+     * to a setter call.
+     *
+     * @param string $propertyName
+     * @param mixed $propertyValue
+     * @return SellingPartnerApi\Model\AplusContentV20201101\Error
+     */
+    public function __set($propertyName, $propertyValue)
+    {
+        $ucProp = ucfirst($propertyName);
+        $setter = "set$ucProp";
+        $this->$setter($propertyValue);
+        return $this;
     }
 }
 
